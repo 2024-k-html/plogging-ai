@@ -28,12 +28,12 @@ def getPointFromImage(api_key: str, image_file: io.BytesIO, model_name: str) -> 
 @app.route('/process_image', methods=['POST'])
 def process_image():
     api_key = request.form.get('api_key')
-    model_name = request.form.get('model_name')
+    model_name = request.form.get("gemini-1.5-pro")
     
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400
     
-    image_file = request.files['image']
+    image_file = request.files['image'] # 여기에 이미지 경로 삽입 
     
     try:
         result = getPointFromImage(api_key, image_file, model_name)

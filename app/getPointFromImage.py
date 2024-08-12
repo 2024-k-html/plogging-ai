@@ -2,8 +2,12 @@ from flask import Flask, request, jsonify
 import google.generativeai as genai
 import PIL.Image
 import io
+import os
 
 app = Flask(__name__)
+
+api_key = os.getenv('GETPOINT_API_KEY')
+model_name = "gemini-1.5-pro"
 
 def getPointFromImage(api_key: str, image_file: io.BytesIO, model_name: str) -> int:
     # API key
@@ -27,9 +31,6 @@ def getPointFromImage(api_key: str, image_file: io.BytesIO, model_name: str) -> 
 
 @app.route('/process_image', methods=['POST'])
 def process_image():
-    api_key = request.form.get('api_key')
-    model_name = request.form.get("gemini-1.5-pro")
-    
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400
     

@@ -82,7 +82,10 @@ def recommend_plogging_place():
 def process_image():
     if 'image' not in request.files:
         return jsonify({'error': 'No image file provided'}), 400
-    image_file = request.files['image']
+    file = request.files['image']  # 'image'는 Java에서 보낸 파일의 필드명
+    file_bytes = file.read()  # 파일 데이터를 바이트로 읽음
+    image_file = BytesIO(file_bytes)
+    
     try:
         result = getPointFromImage(image_api_key, image_file, image_model_name)
         return jsonify({'result': result}), 200

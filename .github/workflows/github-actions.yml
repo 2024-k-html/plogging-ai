@@ -39,3 +39,4 @@ jobs:
           platforms: linux/amd64 #, linux/arm64/v8
         env:
           GETPOINT_API_KEY: ${{ secrets.GETPOINT_API_KEY }}
+          RECOMMEND_API_KEY: ${{ secrets.RECOMMEND_API_KEY }}

@@ -1,22 +1,22 @@
 from flask import Flask, request, jsonify
+from dotenv import load_dotenv
 import requests
 import json
 import os
-import google.generativeai as genai
-import PIL.Image
-import io
 
 app = Flask(__name__)
 
-# Configuration for the recommendation endpoint
-recommend_url = "https://twomiles.openai.azure.com/openai/deployments/gpt4o/chat/completions?api-version=2024-02-15-preview"
-recommend_api_key = os.getenv('RECOMMEND_API_KEY')
+# API 엔드포인트와 API 키
+url = os.environ.get('url')
+api_key = os.environ.get('api_key')
 
-recommend_headers = {
+# 요청 헤더
+headers = {
     "Content-Type": "application/json",
-    "api-key": recommend_api_key
+    "api-key": api_key
 }
 
+# 플로깅 장소와 좌표 
 plogging_places = {
     "김량쟝역 - 용인중앙시장역": [[37.237293, 127.198671], [37.23789, 27.209046]],
     "용인시청 - 명지대역": [[37.240608, 127.1772935], [37.238043, 127.190298]],
@@ -32,24 +32,13 @@ plogging_places = {
     "마북 근린공원 - 구성역" : [[37.2979795, 127.1144222], [37.299013, 127.105664]]
 }
 
-# Configuration for the image processing endpoint
-image_api_key = os.getenv('GETPOINT_API_KEY')
-image_model_name = "gemini-1.5-pro"
-
-def getPointFromImage(api_key: str, image_file: io.BytesIO, model_name: str) -> int:
-    genai.configure(api_key=api_key)
-    sample_file = PIL.Image.open(image_file)
-    model = genai.GenerativeModel(model_name=model_name)
-    prompt = """
-        주어진 사진은 쓰레기봉투에 담긴 쓰레기들이 나와있어. 쓰레기가 봉투에 얼만큼 차있는 지 0 ~ 300 범위 내에 정수로만 반환해줘. 불필요한 설명 빼고 숫자만 출력해줘
-        """
-    response = model.generate_content([prompt, sample_file])
-    return int(response.text)
-
 @app.route('/recommend', methods=['POST'])
 def recommend_plogging_place():
+    # 요청 데이터 파싱
     data = request.json
     user_query = data.get('user_query')
+
+    # 요청 본문
     api_request_data = {
         "model": "gpt-4o",
         "messages": [
@@ -69,24 +58,17 @@ def recommend_plogging_place():
             }
         ]
     }
-    response = requests.post(recommend_url, headers=recommend_headers, data=json.dumps(api_request_data))
+
+    # POST 요청 보내기
+    response = requests.post(url, headers=headers, data=json.dumps(api_request_data))
+
+    # 메세지 부분만 출력 
     response_data = response.json()
     if 'choices' in response_data and len(response_data['choices']) > 0:
         messages = response_data['choices'][0].get('message', {}).get('content', '')
         return jsonify({"response": messages})
     else:
         return jsonify({"error": "No messages found in the response"}), 500
-
-@app.route('/process_image', methods=['POST'])
-def process_image():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image file provided'}), 400
-    image_file = request.files['image']
-    try:
-        result = getPointFromImage(image_api_key, image_file, image_model_name)
-        return jsonify({'result': result}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

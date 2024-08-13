@@ -11,8 +11,5 @@ RUN pip3 install -r requirements.txt
 # 나머지 애플리케이션 파일 복사
 COPY . /app
 
-# Flask 애플리케이션 실행을 위한 환경 변수 설정
-ENV FLASK_APP=app.py
-
 # Flask 애플리케이션 실행
 CMD ["flask", "run", "--host=0.0.0.0"]

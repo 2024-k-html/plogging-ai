@@ -37,3 +37,5 @@ jobs:
             ghcr.io/${{ env.ORG_NAME }}/${{ env.PROJECT_NAME }}-${{ env.SERVICE_NAME }}:${{ github.sha }}
             ${{ github.ref == 'refs/heads/main' && format('ghcr.io/{0}/{1}-{2}:latest', env.ORG_NAME, env.PROJECT_NAME, env.SERVICE_NAME) || '' }}
           platforms: linux/amd64 #, linux/arm64/v8
+        env:
+          GETPOINT_API_KEY: ${{ secrets.GETPOINT_API_KEY }}

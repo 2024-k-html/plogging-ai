@@ -7,8 +7,8 @@ import os
 app = Flask(__name__)
 
 # API 엔드포인트와 API 키
-url = os.environ.get('url')
-api_key = os.environ.get('api_key')
+url = "https://twomiles.openai.azure.com/openai/deployments/gpt4o/chat/completions?api-version=2024-02-15-preview"
+api_key = os.getenv('RECOMMEND_API_KEY')
 
 # 요청 헤더
 headers = {
@@ -71,4 +71,4 @@ def recommend_plogging_place():
         return jsonify({"error": "No messages found in the response"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5002)

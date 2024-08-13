@@ -12,4 +12,4 @@ RUN pip3 install -r requirements.txt
 COPY . /app
 
 # Flask 애플리케이션 실행
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
